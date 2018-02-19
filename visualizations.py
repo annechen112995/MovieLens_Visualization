@@ -36,7 +36,7 @@ def loadMovies(fileName):
         reader=csv.reader(f,delimiter='\t')
         for movieData in reader:
             movies.append(movieData)
-    return modifyMovieData(np.array(movies))
+    return np.array(movies)
 
 def main():
     movie_ratings = loadRatings("data.txt")
