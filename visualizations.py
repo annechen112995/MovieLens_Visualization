@@ -61,10 +61,36 @@ def loadMovies(fileName):
     return movies_new
 
 
-def allRatingsPlot(movie_ratings, directory, title):
-    ratings = movie_ratings[:,2]
-    hist, _ = np.histogram(ratings, bins=[1, 2, 3, 4, 5, 6])
+def getPopularMovies():
+    '''
+    Return the top ten most popular movies (most rated) and their ratings.
+    '''
+    pass
 
+
+def getBestMovies():
+    '''
+    Return the top ten most highly rated movies and their ratings.
+    '''
+    pass
+
+
+def getThreeGenres():
+    '''
+    Return all movies in three genres (comedy, horror, romance) and their
+    ratings.
+    '''
+    pass
+
+
+def allRatingsPlot(movie_ratings, directory, title):
+    '''
+    Plot all ratings in MovieLens dataset
+    '''
+    ratings = movie_ratings[:,2]
+
+    # Plot Histogram
+    hist, _ = np.histogram(ratings, bins=[1, 2, 3, 4, 5, 6])
     plt.bar(np.arange(1,6), hist, align='center')
     plt.title(title)
     plt.xlabel('Rating')
@@ -73,14 +99,23 @@ def allRatingsPlot(movie_ratings, directory, title):
 
 
 def popularRatingsPlot(movie_ratings, movies, directory, title):
+    '''
+    Plot all ratings of ten most popular movies
+    '''
     pass
 
 
 def bestRatingsPlot(movie_ratings, movies, directory, title):
+    '''
+    Plot all ratings of ten best movies (highest avg. ratings)
+    '''
     pass
 
 
 def genreRatingsPlot(movie_ratings, movies, directory, title):
+    '''
+    Plot all ratings from three genres
+    '''
     pass
 
 
