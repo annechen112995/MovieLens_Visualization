@@ -1,6 +1,7 @@
 import numpy as np
 import csv
 
+
 def loadRatings(fileName):
     '''
     Load data from the data.txt file
@@ -17,7 +18,8 @@ def loadRatings(fileName):
     for line in f:
         ratings.append(line.split())
 
-    return np.asarray(ratings, dtype = int)
+    return np.asarray(ratings, dtype=int)
+
 
 
 def loadMovies(fileName):
