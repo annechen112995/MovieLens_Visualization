@@ -1,6 +1,7 @@
 import numpy as np
 import csv
 
+
 def loadRatings(fileName):
     '''
     Load data from the data.txt file
@@ -17,7 +18,8 @@ def loadRatings(fileName):
     for line in f:
         ratings.append(line.split())
 
-    return np.asarray(ratings, dtype = int)
+    return np.asarray(ratings, dtype=int)
+
 
 def loadMovies(fileName):
     '''
@@ -32,12 +34,17 @@ def loadMovies(fileName):
     movie_genres = bool
     '''
     movies = []
-    with open(fileName,'r') as f:
-        reader=csv.reader(f,delimiter='\t')
+    with open(fileName, 'r') as f:
+        reader = csv.reader(f, delimiter='\t')
         for movieData in reader:
             movies.append(movieData)
     return np.array(movies)
 
+
 def main():
     movie_ratings = loadRatings("data.txt")
     movies = loadMovies("movies.txt")
+
+
+if __name__ == "__main__":
+    main()
