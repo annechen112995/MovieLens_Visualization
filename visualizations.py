@@ -1,5 +1,6 @@
-import numpy as np
 import csv
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 def loadRatings(fileName):
@@ -60,8 +61,31 @@ def loadMovies(fileName):
     return movies_new
 
 
+def ratingsLinePlot(movie_ratings, directory, title):
+    ratings = movie_ratings[:,2]
+    hist, _ = np.histogram(ratings, bins=[1, 2, 3, 4, 5, 6])
+
+    plt.bar(np.arange(1,6), hist, align='center')
+    plt.title(title)
+    plt.xlabel("Rating")
+    plt.ylabel("Num. Movies")
+    plt.savefig(directory + title + '.png', bbox_inches='tight')
+
+
 if __name__ == "__main__":
     movie_ratings = loadRatings("data/data.txt")
-    print("movie_ratings: ", movie_ratings)
     movies = loadMovies("data/movies.txt")
-    print("movies: ", movies)
+
+    directory = "visualizations/"
+
+    # Plotting all ratings in MovieLens dataset
+    ratingsLinePlot(movie_ratings, directory, "Ratings_Histogram")
+
+    # Plotting all ratings of ten most popular movies
+
+
+    # Plotting all ratings of ten best movies (highest avg. ratings)
+
+
+    # Plotting all ratings from three genres
+    
