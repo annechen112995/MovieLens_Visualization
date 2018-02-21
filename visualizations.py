@@ -1,5 +1,6 @@
 import csv
 import heapq
+import itertools
 import numpy as np
 import matplotlib.pyplot as plt
 from operator import itemgetter
@@ -110,12 +111,21 @@ def getBestMovies(movie_ratings):
     return highest_avg_movie_ratings
 
 
-def getThreeGenres(movie_ratings, movies):
+def getThreeGenres(movie_category, genreList):
     '''
     Return all movies in three genres (comedy, horror, romance) and their
     ratings.
     '''
-    pass
+    # Index corresponding to genres Comedy, Horror, Romance
+    genreMoviesList = []
+    for i in range(len(genreList)):
+        movieList = []
+        for j in range(len(movie_category)):
+            if (movie_category[j + 1][genreList[i]]) == 1:
+                movieList.append(j + 1)
+        genreMoviesList.append(movieList)
+
+    return genreMoviesList
 
 
 def allRatingsPlot(movie_ratings, directory, title):
@@ -187,21 +197,44 @@ def bestRatingsPlot(movie_ratings, directory, title):
     plt.xlabel('Rating')
     plt.ylabel('Num. Movies')
     plt.savefig(directory + title + '_Histogram' + '.png', bbox_inches='tight')
+    plt.clf()
 
 
-def genreRatingsPlot(movie_ratings, movies, directory, title):
+def genreRatingsPlot(movie_ratings, movie_ID, movie_category, movie_genres,
+    directory, title):
     '''
     Plot all ratings from three genres
     '''
-    genreMovies = getThreeGenres(movie_ratings, movies)
-    pass
+    genreList = [5, 11, 14]
+    genreMovies = getThreeGenres(movie_category, genreList)
+    movieRatings = getMovieRatings(movie_ratings)
+    totalRatingsList = []
+
+    for i in range(len(genreMovies)):
+        ratingsList = []
+        for j in range(len(genreMovies[i])):
+            index = int(genreMovies[i][j])
+            ratingsList = ratingsList + list(movieRatings[index])
+        totalRatingsList.append(ratingsList)
+
+    for k in range(len(totalRatingsList)):
+        # Plot Histogram
+        hist, _ = np.histogram(totalRatingsList[k], bins=[1, 2, 3, 4, 5, 6])
+        plt.bar(np.arange(1, 6), hist, align='center')
+        plt.title(movie_genres[genreList[k]] + '_' + title)
+        plt.xlabel('Rating')
+        plt.ylabel('Num. Movies')
+        plt.savefig(
+            directory + movie_genres[genreList[k]] + '_' + title + '_Histogram'
+            + '.png', bbox_inches='tight')
+        plt.clf()
 
 
 if __name__ == '__main__':
     # movie_ratings = [[user ID, movie ID, rating]]
     movie_ratings = loadRatings('data/data.txt')
     # movie_ID = {movie_id:movie_title}
-    # movie_categoty = {movie_id:categories}
+    # movie_category = {movie_id:categories}
     # movie_genres = {index of genre: genre name}
     movie_ID, movie_category, movie_genres = loadMovies('data/movies.txt')
 
@@ -209,7 +242,7 @@ if __name__ == '__main__':
     allRatingsTitle = 'All_Ratings'
     popularRatingsTitle = 'Top_Ten_Popular_Movie_Ratings'
     bestRatingsTitle = 'Top_Ten_Best_Movie_Ratings'
-    genreRatingsTitle = 'Comedy_Horror_Romance_Movie_Ratings'
+    genreRatingsTitle = 'Movie_Ratings'
 
     # Plotting all ratings in MovieLens dataset
     allRatingsPlot(movie_ratings, directory, allRatingsTitle)
@@ -221,4 +254,6 @@ if __name__ == '__main__':
     bestRatingsPlot(movie_ratings, directory, bestRatingsTitle)
 
     # Plotting all ratings from three genres
-    genreRatingsPlot(movie_ratings, movie_ID, directory, genreRatingsTitle)
+    genreRatingsPlot(
+        movie_ratings, movie_ID, movie_category, movie_genres, directory,
+        genreRatingsTitle)
