@@ -1,6 +1,7 @@
 import csv
 import numpy as np
 import matplotlib.pyplot as plt
+from operator import itemgetter
 
 
 def loadRatings(fileName):
@@ -69,11 +70,38 @@ def getPopularMovies(movie_ratings, movies):
     pass
 
 
-def getBestMovies(movie_ratings, movies):
+def getMovieRatings(movie_ratings):
+    '''
+    Returns a dictionary of {movie_id: np.array([ratings])}
+    '''
+    # dictionary of ratings
+    ratings = {}
+    for _, movie_id, rating in movie_ratings:
+        if movie_id not in ratings:
+            ratings[movie_id] = np.array([rating])
+        else:
+            ratings[movie_id] = np.append(ratings[movie_id], rating)
+    return ratings
+
+
+def getBestMovies(movie_ratings):
     '''
     Return the top ten most highly rated movies and their ratings.
     '''
-    pass
+    num_highest = 10
+
+    # dictionary of ratings
+    ratings = getMovieRatings(movie_ratings)
+
+    # average ratings
+    avg_ratings = {k: np.mean(ratings[k]) for k in ratings}
+    sorted_avg_ratings = sorted(avg_ratings.items(), key=itemgetter(1),
+                                reverse=True)
+
+    highest_avg_movie = sorted_avg_ratings[:num_highest]
+    highest_avg_movie_ratings = {k: ratings[k] for (k, _) in highest_avg_movie}
+
+    return highest_avg_movie_ratings
 
 
 def getThreeGenres(movie_ratings, movies):
@@ -88,11 +116,11 @@ def allRatingsPlot(movie_ratings, directory, title):
     '''
     Plot all ratings in MovieLens dataset
     '''
-    ratings = movie_ratings[:,2]
+    ratings = movie_ratings[:, 2]
 
     # Plot Histogram
     hist, _ = np.histogram(ratings, bins=[1, 2, 3, 4, 5, 6])
-    plt.bar(np.arange(1,6), hist, align='center')
+    plt.bar(np.arange(1, 6), hist, align='center')
     plt.title(title)
     plt.xlabel('Rating')
     plt.ylabel('Num. Movies')
@@ -107,12 +135,26 @@ def popularRatingsPlot(movie_ratings, movies, directory, title):
     pass
 
 
-def bestRatingsPlot(movie_ratings, movies, directory, title):
+def bestRatingsPlot(movie_ratings, directory, title):
     '''
     Plot all ratings of ten best movies (highest avg. ratings)
     '''
-    bestMovies = getBestMovies(movie_ratings, movies)
-    pass
+
+    # Get {movie_id: np.array([ratings])} of 10 top rated movies
+    bestMovies = getBestMovies(movie_ratings)
+
+    # Get the list of ratings of these movies
+    ratingsOfBestMovies = []
+    for ratings in bestMovies.values():
+        ratingsOfBestMovies += list(ratings)
+
+    # Plot Histogram
+    hist, _ = np.histogram(ratingsOfBestMovies, bins=[1, 2, 3, 4, 5, 6])
+    plt.bar(np.arange(1, 6), hist, align='center')
+    plt.title(title)
+    plt.xlabel('Rating')
+    plt.ylabel('Num. Movies')
+    plt.savefig(directory + title + '_Histogram' + '.png', bbox_inches='tight')
 
 
 def genreRatingsPlot(movie_ratings, movies, directory, title):
@@ -124,7 +166,11 @@ def genreRatingsPlot(movie_ratings, movies, directory, title):
 
 
 if __name__ == '__main__':
+    # movie_ratings = [[user ID, movie ID, rating]]
     movie_ratings = loadRatings('data/data.txt')
+    # movie_ID = {movie_id:movie_title}
+    # movie_categoty = {movie_id:categories}
+    # movie_genres = {index of genre: genre name}
     movie_ID, movie_category, movie_genres = loadMovies('data/movies.txt')
 
     directory = 'visualizations/'
@@ -134,13 +180,13 @@ if __name__ == '__main__':
     genreRatingsTitle = 'Comedy_Horror_Romance_Movie_Ratings'
 
     # Plotting all ratings in MovieLens dataset
-    allRatingsPlot(movie_ratings, directory, allRatingsTitle)
+    # allRatingsPlot(movie_ratings, directory, allRatingsTitle)
 
     # Plotting all ratings of ten most popular movies
-    popularRatingsPlot(movie_ratings, movie_ID, directory, popularRatingsTitle)
+    # popularRatingsPlot(movie_ratings, movie_ID, directory, popularRatingsTitle)
 
     # Plotting all ratings of ten best movies (highest avg. ratings)
-    bestRatingsPlot(movie_ratings, movie_ID, directory, bestRatingsTitle)
+    bestRatingsPlot(movie_ratings, directory, bestRatingsTitle)
 
     # Plotting all ratings from three genres
-    genreRatingsPlot(movie_ratings, movie_ID, directory, genreRatingsTitle)
+    # genreRatingsPlot(movie_ratings, movie_ID, directory, genreRatingsTitle)
