@@ -34,32 +34,34 @@ def loadMovies(fileName):
 
     movie_id = int
     movie_title = string
-    movie_genres = bool
-    '''
-    movies = []
-    movies_new = []
+    {Unknown, Action,..., Western} = bool (0 or 1)
 
-    movie_genres = {2: 'Unknown', 3: 'Action', 4: 'Adventure', 5: 'Animation',
-            6: 'Childrens', 7: 'Comedy', 8: 'Crime', 9: 'Documentary',
-            10: 'Drama', 11: 'Fantasy', 12: 'Film-Noir', 13: 'Horror',
-            14: 'Musical', 15: 'Mystery', 16: 'Romance', 17: 'Sci-Fi',
-            18: 'Thriller', 19: 'War', 20:'Western'}
+    returns three dictionaries
+    movie_ID = {movie_id:movie_title}
+    movie_categoty = {movie_id:categories}
+        where categories is a numpy array of 0 or 1 representing if the 
+        movie falls under the category
+    movie_genres = {index of genre: genre name}
+    '''
+    movie_ID = {}
+    movie_category = {}
+
+    movie_genres = {
+        0: 'Unknown', 1: 'Action', 2: 'Adventure', 3: 'Animation',
+        4: 'Childrens', 5: 'Comedy', 6: 'Crime', 7: 'Documentary',
+        8: 'Drama', 9: 'Fantasy', 10: 'Film-Noir', 11: 'Horror',
+        12: 'Musical', 13: 'Mystery', 14: 'Romance', 15: 'Sci-Fi',
+        16: 'Thriller', 17: 'War', 18: 'Western'}
 
     with open(fileName, encoding='ISO-8859-1') as f:
-        reader=csv.reader(f,delimiter='\t')
+        reader = csv.reader(f, delimiter='\t')
         for movieData in reader:
-            movies.append(movieData)
+            # print(movieData)
+            movie_ID[int(movieData[0])] = movieData[1]
+            categories = [int(x) for x in movieData[2:]]
+            movie_category[int(movieData[0])] = np.asarray(categories)
 
-    movies = np.asarray(movies)
-
-    for movie in movies:
-        index = -1
-        for i, j in enumerate(movie):
-            if j == '1':
-                index = i
-        movies_new.append([movie[0], movie[1], movie_genres[index]])
-
-    return movies_new
+    return movie_ID, movie_category, movie_genres
 
 
 def getPopularMovies(movie_ratings, movies):
@@ -129,7 +131,7 @@ def genreRatingsPlot(movie_ratings, movies, directory, title):
 
 if __name__ == '__main__':
     movie_ratings = loadRatings('data/data.txt')
-    movies = loadMovies('data/movies.txt')
+    movie_ID, movie_category, movie_genres = loadMovies('data/movies.txt')
 
     directory = 'visualizations/'
     allRatingsTitle = 'All_Ratings'
@@ -141,10 +143,10 @@ if __name__ == '__main__':
     allRatingsPlot(movie_ratings, directory, allRatingsTitle)
 
     # Plotting all ratings of ten most popular movies
-    popularRatingsPlot(movie_ratings, movies, directory, popularRatingsTitle)
+    popularRatingsPlot(movie_ratings, movie_ID, directory, popularRatingsTitle)
 
     # Plotting all ratings of ten best movies (highest avg. ratings)
-    bestRatingsPlot(movie_ratings, movies, directory, bestRatingsTitle)
+    bestRatingsPlot(movie_ratings, movie_ID, directory, bestRatingsTitle)
 
     # Plotting all ratings from three genres
-    genreRatingsPlot(movie_ratings, movies, directory, genreRatingsTitle)
+    genreRatingsPlot(movie_ratings, movie_ID, directory, genreRatingsTitle)
