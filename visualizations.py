@@ -1,6 +1,8 @@
 import csv
+import heapq
 import numpy as np
 import matplotlib.pyplot as plt
+from collections import Counter
 
 
 def loadRatings(fileName):
@@ -64,7 +66,11 @@ def getPopularMovies(movie_ratings, movies):
     '''
     Return the top ten most popular movies (most rated) and their ratings.
     '''
-    pass
+    popularMovies = list(movie_ratings[:,1])
+    count = Counter(popularMovies)
+    topTen = count.most_common(10)
+
+    return topTen
 
 
 def getBestMovies(movie_ratings, movies):
@@ -102,7 +108,7 @@ def popularRatingsPlot(movie_ratings, movies, directory, title):
     Plot all ratings of ten most popular movies
     '''
     popularMovies = getPopularMovies(movie_ratings, movies)
-    pass
+    print(popularMovies)
 
 
 def bestRatingsPlot(movie_ratings, movies, directory, title):
