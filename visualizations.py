@@ -22,7 +22,6 @@ def loadRatings(fileName):
     return np.asarray(ratings, dtype=int)
 
 
-
 def loadMovies(fileName):
     '''
     Load data from the movies.txt file
@@ -61,21 +60,21 @@ def loadMovies(fileName):
     return movies_new
 
 
-def getPopularMovies():
+def getPopularMovies(movie_ratings, movies):
     '''
     Return the top ten most popular movies (most rated) and their ratings.
     '''
     pass
 
 
-def getBestMovies():
+def getBestMovies(movie_ratings, movies):
     '''
     Return the top ten most highly rated movies and their ratings.
     '''
     pass
 
 
-def getThreeGenres():
+def getThreeGenres(movie_ratings, movies):
     '''
     Return all movies in three genres (comedy, horror, romance) and their
     ratings.
@@ -102,6 +101,7 @@ def popularRatingsPlot(movie_ratings, movies, directory, title):
     '''
     Plot all ratings of ten most popular movies
     '''
+    popularMovies = getPopularMovies(movie_ratings, movies)
     pass
 
 
@@ -109,6 +109,7 @@ def bestRatingsPlot(movie_ratings, movies, directory, title):
     '''
     Plot all ratings of ten best movies (highest avg. ratings)
     '''
+    bestMovies = getBestMovies(movie_ratings, movies)
     pass
 
 
@@ -116,6 +117,7 @@ def genreRatingsPlot(movie_ratings, movies, directory, title):
     '''
     Plot all ratings from three genres
     '''
+    genreMovies = getThreeGenres(movie_ratings, movies)
     pass
 
 
