@@ -83,15 +83,15 @@ def train_model(M, N, K, eta, reg, Y, bias, eps=0.0001, max_epochs=300):
     Returns a tuple (U, V, err) consisting of U, V, and the unregularized MSE
     of the model.
     """
-    print("K = %d" % K)
+    # print("K = %d" % K)
 
     n_rows = Y.shape[0]
 
     # Randomly initialize U and V
     U = np.random.rand(M, K) - 0.5
     V = np.random.rand(N, K) - 0.5
-    print("U.shape: ", U.shape)
-    print("V.shape: ", V.shape)
+    # print("U.shape: ", U.shape)
+    # print("V.shape: ", V.shape)
 
     # If adding bias
     ratings = Y[:, 2]
@@ -128,7 +128,7 @@ def train_model(M, N, K, eta, reg, Y, bias, eps=0.0001, max_epochs=300):
                 b_i[j] += eta * (e - reg * b_i[j])
 
         new_error = get_err(U, V, Y, reg, b, b_u, b_i, False)
-        print("epoch: %d, error: %f" % (epoch, new_error))
+        # print("epoch: %d, error: %f" % (epoch, new_error))
 
         # Epoch 1
         if decrease is None:

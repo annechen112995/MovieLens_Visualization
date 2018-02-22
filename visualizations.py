@@ -2,6 +2,7 @@ import csv
 import numpy as np
 import matrixFactorization as mf
 import matplotlib.pyplot as plt
+from scipy.sparse.linalg import svds
 from basicVisualization import basicVisualization
 
 BORDER = "==================================================================="
@@ -105,10 +106,49 @@ def method1(train, test):
 
     reg = 10**-1
     eta = 0.03  # learning rate
-    U, V, E_in = mf.train_model(M, N, K, eta, reg, train, False)
-    E_out = mf.get_err(U, V, test, reg, 0, 0, 0, False)
+    U, V, _ = mf.train_model(M, N, K, eta, reg, train, False)
+    E_in = mf.get_err(U, V, train, 0, 0, 0, 0, False)
+    E_out = mf.get_err(U, V, test, 0, 0, 0, 0, False)
     print("E_in = ", E_in)
     print("E_out = ", E_out)
+
+    return U, V
+
+
+def get_err_from_pred(pred, ratings):
+    n_rows = ratings.shape[0]
+    error = 0
+
+    for row in range(n_rows):
+        user_ind = ratings[row, 0] - 1
+        movie_ind = ratings[row, 1] - 1
+        rating = ratings[row, 2]
+        dev = rating - pred[user_ind, movie_ind]
+        error += dev * dev
+    return ((1 / 2.) * error) / n_rows
+
+
+def method3(train, test):
+    print(BORDER)
+    print("Method 3")
+    M = max(max(train[:, 0]), max(test[:, 0])).astype(int)  # users
+    N = max(max(train[:, 1]), max(test[:, 1])).astype(int)  # movies
+
+    train_matrix = np.zeros((M, N))
+    n_rows = train.shape[0]
+    for row in range(n_rows):
+        user_ind = train[row, 0] - 1
+        movie_ind = train[row, 1] - 1
+        train_matrix[user_ind, movie_ind] = train[row, 2]
+    U, s, Vt = svds(train_matrix, k=20)
+    s_diag_matrix = np.diag(s)
+    pred = np.dot(np.dot(U, s_diag_matrix), Vt)
+    E_in = get_err_from_pred(pred, train)
+    E_out = get_err_from_pred(pred, test)
+    print("E_in = ", E_in)
+    print("E_out = ", E_out)
+
+    return U, Vt.transpose()
 
 
 if __name__ == '__main__':
@@ -132,4 +172,5 @@ if __name__ == '__main__':
     train = loadRatings(trainingFile)
     test = loadRatings(testFile)
 
-    method1_reg(train, test)
+    # method1(train, test)
+    method3(train, test)
