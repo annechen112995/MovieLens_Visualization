@@ -176,4 +176,4 @@ if __name__ == '__main__':
     U, V = method1(train, test)
     # method3(train, test)
 
-    projection(V)
+    movie_proj, user_proj = projection(U, V)
