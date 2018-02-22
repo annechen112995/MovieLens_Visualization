@@ -5,7 +5,7 @@ import numpy as np
 from numpy import linalg as LA
 
 
-def grad_U(Ui, Yij, Vj, reg, eta):
+def grad_U(Ui, Yij, Vj, ai, bj, mu, reg, eta):
     """
     Takes as input Ui (the ith row of U), a training point Yij, the column
     vector Vj (jth column of V^T), reg (the regularization parameter lambda),
@@ -14,12 +14,13 @@ def grad_U(Ui, Yij, Vj, reg, eta):
     Returns the gradient of the regularized loss function with
     respect to Ui multiplied by eta.
     """
-    gradient = (reg * Ui) - (Vj * (Yij - np.dot(Ui, Vj)))
+    t1 = Yij - mu - np.dot(Ui, Vj) - ai - bj
+    gradient = (reg * Ui) - 2*(Vj * (t1))
     ret = eta * gradient
     return ret
 
 
-def grad_V(Vj, Yij, Ui, reg, eta):
+def grad_V(Vj, Yij, Ui, ai, bj, mu, reg, eta):
     """
     Takes as input the column vector Vj (jth column of V^T), a training point
     Yij, Ui (the ith row of U), reg (the regularization parameter lambda),
@@ -28,12 +29,27 @@ def grad_V(Vj, Yij, Ui, reg, eta):
     Returns the gradient of the regularized loss function with
     respect to Vj multiplied by eta.
     """
-    gradient = (reg * Vj) - ((Yij - np.dot(Ui, Vj)) * Ui)
+    t1 = Yij - mu - np.dot(Ui, Vj) - ai - bj
+    gradient = (reg * Vj) - 2*(Ui * (t1))
     ret = eta * gradient
     return ret
 
 
-def get_err(U, V, Y, reg):
+def grad_A(Ui, Yij, Vj, ai, bj, mu, reg, eta):
+    t1 = Yij - mu - np.dot(Ui, Vj) - ai - bj
+    gradient = (reg * ai) - 2*(t1)
+    ret = eta * gradient
+    return ret
+
+
+def grad_B(Ui, Yij, Vj, ai, bj, mu, reg, eta):
+    t1 = Yij - mu - np.dot(Ui, Vj) - ai - bj
+    gradient = (reg * bj) - 2*(t1)
+    ret = eta * gradient
+    return ret
+
+
+def get_err(U, V, Y, a, b, mu, reg):
     """
     Takes as input a matrix Y of triples (i, j, Y_ij) where i is the index of
     a user, j is the index of a movie, and Y_ij is user i's rating of movie j
@@ -51,15 +67,20 @@ def get_err(U, V, Y, reg):
         j = Y[row, 1] - 1
         Y_ij = Y[row, 2]
         pred = np.dot(U[i, :], V[j, :])
-        dev = (Y_ij - pred)
+        dev = (Y_ij - pred - mu - a[i] - b[j])
         error += dev * dev
 
     normU = LA.norm(U, 'fro')
     normU_squared = normU * normU
     normV = LA.norm(V, 'fro')
     normV_squared = normV * normV
+    normA = LA.norm(a)
+    normA_squared = normA * normA
+    normB = LA.norm(b)
+    normB_squared = normB * normB
 
-    error = ((reg / 2.) * (normU_squared + normV_squared)) + error
+    error = ((reg / 2.) * (normU_squared + normV_squared + normA_squared +
+        normB_squared)) + error
 
     return error / n_rows
 
@@ -89,8 +110,14 @@ def train_model(M, N, K, eta, reg, Y, eps=0.0001, max_epochs=300):
     # print("U.shape: ", U.shape)
     # print("V.shape: ", V.shape)
 
+    # Generate bias matrix
+    ratings = Y[:, 2]
+    a = np.zeros(M)
+    b = np.zeros(N)
+    mu = np.mean(ratings[np.where(ratings != 0)])
+
     # Defines variable for keeping track with stopping condition
-    prev_error = get_err(U, V, Y, reg)
+    prev_error = get_err(U, V, Y, a, b, mu, reg)
     decrease = None
 
     for epoch in range(max_epochs):
@@ -100,10 +127,15 @@ def train_model(M, N, K, eta, reg, Y, eps=0.0001, max_epochs=300):
             i = Y[row, 0] - 1
             j = Y[row, 1] - 1
             Y_ij = Y[row, 2]
-            U[i, :] = U[i, :] - grad_U(U[i, :], Y_ij, V[j, :], reg, eta)
-            V[j, :] = V[j, :] - grad_V(V[j, :], Y_ij, U[i, :], reg, eta)
 
-        new_error = get_err(U, V, Y, reg)
+            # Update biases
+            a[i] = a[i] - grad_A(U[i, :], Y_ij, V[j, :], a[i], b[j], mu, reg, eta)
+            b[j] = b[j] - grad_B(U[i, :], Y_ij, V[j, :], a[i], b[j], mu, reg, eta)
+
+            U[i, :] = U[i, :] - grad_U(U[i, :], Y_ij, V[j, :], a[i], b[j], mu, reg, eta)
+            V[j, :] = V[j, :] - grad_V(V[j, :], Y_ij, U[i, :], a[i], b[j], mu, reg, eta)
+
+        new_error = get_err(U, V, Y, a, b, mu, reg)
         print("epoch: %d, error: %f" % (epoch, new_error))
 
         # Epoch 1
@@ -119,4 +151,4 @@ def train_model(M, N, K, eta, reg, Y, eps=0.0001, max_epochs=300):
         else:
             prev_error = new_error
 
-    return (U, V, prev_error)
+    return (U, V, prev_error, a, b, mu)
