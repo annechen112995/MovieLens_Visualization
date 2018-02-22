@@ -33,7 +33,7 @@ def grad_V(Vj, Yij, Ui, reg, eta):
     return ret
 
 
-def get_err(U, V, Y, reg=0.0):
+def get_err(U, V, Y, reg, b, b_u, b_i, bias):
     """
     Takes as input a matrix Y of triples (i, j, Y_ij) where i is the index of
     a user, j is the index of a movie, and Y_ij is user i's rating of movie j
@@ -45,11 +45,15 @@ def get_err(U, V, Y, reg=0.0):
     """
     n_rows = Y.shape[0]
     error = 0
+
     for row in range(n_rows):
         i = Y[row, 0] - 1
         j = Y[row, 1] - 1
         Y_ij = Y[row, 2]
-        pred = np.dot(U[i, :], V[j, :])
+        if bias:
+            pred = b + b_u[:,np.newaxis] + b_i[np.newaxis:,] + np.dot(U[i, :], V[j, :])
+        else:
+            pred = np.dot(U[i, :], V[j, :])
         dev = (Y_ij - pred)
         error += dev * dev
 
@@ -64,7 +68,7 @@ def get_err(U, V, Y, reg=0.0):
     return error / n_rows
 
 
-def train_model(M, N, K, eta, reg, Y, eps=0.0001, max_epochs=300):
+def train_model(M, N, K, eta, reg, Y, bias, eps=0.0001, max_epochs=300):
     """
     Given a training data matrix Y containing rows (i, j, Y_ij)
     where Y_ij is user i's rating on movie j, learns an
@@ -88,8 +92,20 @@ def train_model(M, N, K, eta, reg, Y, eps=0.0001, max_epochs=300):
     V = np.random.rand(N, K) - 0.5
     print("U.shape: ", U.shape)
     print("V.shape: ", V.shape)
+
+    # If adding bias
+    ratings = Y[:, 2]
+    if bias:
+        b_u = np.zeros(M)
+        b_i = np.zeros(N)
+        b = np.mean(ratings[np.where(ratings != 0)])
+    else:
+        b = 0
+        b_u = 0
+        b_i = 0
+
     # Defines variable for keeping track with stopping condition
-    prev_error = get_err(U, V, Y, reg)
+    prev_error = get_err(U, V, Y, reg, b, b_u, b_i, False)
     decrease = None
 
     for epoch in range(max_epochs):
@@ -102,7 +118,16 @@ def train_model(M, N, K, eta, reg, Y, eps=0.0001, max_epochs=300):
             U[i, :] = U[i, :] - grad_U(U[i, :], Y_ij, V[j, :], reg, eta)
             V[j, :] = V[j, :] - grad_V(V[j, :], Y_ij, U[i, :], reg, eta)
 
-        new_error = get_err(U, V, Y, reg)
+            if bias:
+                # Compute prediction and error
+                prediction = b + b_u[i] + b_i[j] + U[i, :].dot(V[j, :].T)
+                e = (Y_ij - prediction)
+
+                # Update biases
+                b_u[i] += eta * (e - reg * b_u[i])
+                b_i[j] += eta * (e - reg * b_i[j])
+
+        new_error = get_err(U, V, Y, reg, b, b_u, b_i, False)
         print("epoch: %d, error: %f" % (epoch, new_error))
 
         # Epoch 1
