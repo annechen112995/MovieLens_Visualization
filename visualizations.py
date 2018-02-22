@@ -1,6 +1,7 @@
 import csv
 import numpy as np
 import matrixFactorization as mf
+import biasMatrixFactorization as bmf
 import matplotlib.pyplot as plt
 from scipy.sparse.linalg import svds
 from basicVisualization import basicVisualization
@@ -108,8 +109,27 @@ def method1(train, test):
     reg = 10**-1
     eta = 0.03  # learning rate
     U, V, _ = mf.train_model(M, N, K, eta, reg, train)
-    E_in = mf.get_err(U, V, train)
-    E_out = mf.get_err(U, V, test)
+    E_in = mf.get_err(U, V, train, 0.0)
+    E_out = mf.get_err(U, V, test, 0.0)
+    print("E_in = ", E_in)
+    print("E_out = ", E_out)
+
+    return U, V
+
+
+def methodBias(train, test):
+    print(BORDER)
+    print("Method with Bias")
+    M = max(max(train[:, 0]), max(test[:, 0])).astype(int)  # users
+    N = max(max(train[:, 1]), max(test[:, 1])).astype(int)  # movies
+    print("Factorizing with ", M, " users, ", N, " movies.")
+    K = 20
+
+    reg = 10**-1
+    eta = 0.03  # learning rate
+    U, V, err, a, b, mu = bmf.train_model(M, N, K, eta, reg, train)
+    E_in = bmf.get_err(U, V, train, a, b, mu, reg)
+    E_out = bmf.get_err(U, V, test, a, b, mu, reg)
     print("E_in = ", E_in)
     print("E_out = ", E_out)
 
@@ -175,5 +195,6 @@ if __name__ == '__main__':
 
     U, V = method1(train, test)
     # method3(train, test)
+    # methodBias(train, test)
 
     movie_proj, user_proj = projection(U, V)
