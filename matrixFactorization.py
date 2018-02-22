@@ -33,7 +33,7 @@ def grad_V(Vj, Yij, Ui, reg, eta):
     return ret
 
 
-def get_err(U, V, Y, reg):
+def get_err(U, V, Y, reg=0.0):
     """
     Takes as input a matrix Y of triples (i, j, Y_ij) where i is the index of
     a user, j is the index of a movie, and Y_ij is user i's rating of movie j

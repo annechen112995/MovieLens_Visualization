@@ -4,6 +4,7 @@ import matrixFactorization as mf
 import matplotlib.pyplot as plt
 from scipy.sparse.linalg import svds
 from basicVisualization import basicVisualization
+from projection import projection
 
 BORDER = "==================================================================="
 
@@ -75,7 +76,7 @@ def method1_reg(train, test):
     print("Factorizing with ", M, " users, ", N, " movies.")
     K = 20
 
-    regs = [10**-4, 10**-3, 10**-2, 10**-1, 1]
+    regs = [10**-4, 10**-3, 10**-2, 10**-1, 1, 10, 10**2]
     eta = 0.03  # learning rate
     E_ins = []
     E_outs = []
@@ -172,5 +173,7 @@ if __name__ == '__main__':
     train = loadRatings(trainingFile)
     test = loadRatings(testFile)
 
-    method1(train, test)
+    U, V = method1(train, test)
     # method3(train, test)
+
+    projection(V)
