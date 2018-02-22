@@ -13,13 +13,13 @@ def two_dir_projection(V):
 def projection(U, V):
     proj = two_dir_projection(V)
 
-    movie_proj = np.dot(proj.T, V.T)
-    user_proj = np.dot(proj.T, U.T)
+    U_proj = np.dot(proj.T, U.T)
+    V_proj = np.dot(proj.T, V.T)
 
     # Rescale so that each direction has variance of 1
-    movie_proj[0, :] /= np.std(movie_proj[0, :])
-    movie_proj[1, :] /= np.std(movie_proj[1, :])
-    user_proj[0, :] /= np.std(user_proj[0, :])
-    user_proj[1, :] /= np.std(user_proj[1, :])
+    V_proj[0, :] /= np.std(V_proj[0, :])
+    V_proj[1, :] /= np.std(V_proj[1, :])
+    U_proj[0, :] /= np.std(U_proj[0, :])
+    U_proj[1, :] /= np.std(U_proj[1, :])
 
-    return movie_proj, user_proj
+    return U_proj, V_proj

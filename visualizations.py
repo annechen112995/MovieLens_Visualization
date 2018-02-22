@@ -52,11 +52,11 @@ def loadMovies(fileName):
     movie_category = {}
 
     movie_genres = {
-        0: 'Unknown', 1: 'Action', 2: 'Adventure', 3: 'Animation',
-        4: 'Childrens', 5: 'Comedy', 6: 'Crime', 7: 'Documentary',
-        8: 'Drama', 9: 'Fantasy', 10: 'Film-Noir', 11: 'Horror',
-        12: 'Musical', 13: 'Mystery', 14: 'Romance', 15: 'Sci-Fi',
-        16: 'Thriller', 17: 'War', 18: 'Western'}
+        0:  'Unknown',   1:  'Action',  2:  'Adventure', 3: 'Animation',
+        4:  'Childrens', 5:  'Comedy',  6:  'Crime',     7: 'Documentary',
+        8:  'Drama',     9:  'Fantasy', 10: 'Film-Noir', 11: 'Horror',
+        12: 'Musical',   13: 'Mystery', 14: 'Romance',   15: 'Sci-Fi',
+        16: 'Thriller',  17: 'War',     18: 'Western'}
 
     with open(fileName, encoding='ISO-8859-1') as f:
         reader = csv.reader(f, delimiter='\t')
@@ -69,9 +69,9 @@ def loadMovies(fileName):
     return movie_ID, movie_category, movie_genres
 
 
-def method1_reg(train, test):
+def Homework_5_SVD_With_Regularization(train, test):
     print(BORDER)
-    print("Method 1 - reg")
+    print("Homework_5_SVD_With_Regularization - reg")
     M = max(max(train[:, 0]), max(test[:, 0])).astype(int)  # users
     N = max(max(train[:, 1]), max(test[:, 1])).astype(int)  # movies
     print("Factorizing with ", M, " users, ", N, " movies.")
@@ -98,9 +98,9 @@ def method1_reg(train, test):
     plt.savefig('method1_reg.png')
 
 
-def method1(train, test):
+def Homework_5_SVD(train, test):
     print(BORDER)
-    print("Method 1")
+    print("Homework_5_SVD")
     M = max(max(train[:, 0]), max(test[:, 0])).astype(int)  # users
     N = max(max(train[:, 1]), max(test[:, 1])).astype(int)  # movies
     print("Factorizing with ", M, " users, ", N, " movies.")
@@ -117,9 +117,9 @@ def method1(train, test):
     return U, V
 
 
-def methodBias(train, test):
+def SVD_With_Bias(train, test):
     print(BORDER)
-    print("Method with Bias")
+    print("SVD_With_Bias")
     M = max(max(train[:, 0]), max(test[:, 0])).astype(int)  # users
     N = max(max(train[:, 1]), max(test[:, 1])).astype(int)  # movies
     print("Factorizing with ", M, " users, ", N, " movies.")
@@ -136,7 +136,7 @@ def methodBias(train, test):
     return U, V
 
 
-def get_err_from_pred(pred, ratings):
+def Get_Err_From_Pred(pred, ratings):
     n_rows = ratings.shape[0]
     error = 0
 
@@ -149,9 +149,9 @@ def get_err_from_pred(pred, ratings):
     return ((1 / 2.) * error) / n_rows
 
 
-def method3(train, test):
+def Off_The_Shelf_SVD(train, test):
     print(BORDER)
-    print("Method 3")
+    print("Off_The_Shelf_SVD")
     M = max(max(train[:, 0]), max(test[:, 0])).astype(int)  # users
     N = max(max(train[:, 1]), max(test[:, 1])).astype(int)  # movies
 
@@ -164,8 +164,8 @@ def method3(train, test):
     U, s, Vt = svds(train_matrix, k=20)
     s_diag_matrix = np.diag(s)
     pred = np.dot(np.dot(U, s_diag_matrix), Vt)
-    E_in = get_err_from_pred(pred, train)
-    E_out = get_err_from_pred(pred, test)
+    E_in = Get_Err_From_Pred(pred, train)
+    E_out = Get_Err_From_Pred(pred, test)
     print("E_in = ", E_in)
     print("E_out = ", E_out)
 
@@ -191,10 +191,35 @@ if __name__ == '__main__':
                        directory)
 
     train = loadRatings(trainingFile)
-    test = loadRatings(testFile)
+    test  = loadRatings(testFile)
 
-    U, V = method1(train, test)
-    # method3(train, test)
-    # methodBias(train, test)
+    U, V = Homework_5_SVD(train, test)
 
-    movie_proj, user_proj = projection(U, V)
+    U_proj, V_proj = projection(U, V)
+
+    #===============================================================================================
+    # Visualize V for any ten movies of your choice from the MovieLens dataset.
+    # Let's choose the first 10, because I'm lazy
+    #===============================================================================================
+    V0 = V_proj[0, 1:10]
+    V1 = V_proj[1, 1:10]
+
+    #===============================================================================================
+    # Visualize V for the ten most popular movies (movies which have received the most ratings).
+    #===============================================================================================
+	
+    #===============================================================================================
+	# Visualize V for the ten best movies (movies with the highest average ratings).
+    #===============================================================================================
+	
+    #===============================================================================================
+	# Visualize V for ten movies from the Comedy genre you selected in Section 4, Basic Visualizations
+    #===============================================================================================
+	
+    #===============================================================================================
+	# Visualize V for ten movies from the Romance genre you selected in Section 4, Basic Visualizations
+    #===============================================================================================
+
+    #===============================================================================================
+	# Visualize V for ten movies from the Horror genre you selected in Section 4, Basic Visualizations
+    #===============================================================================================
