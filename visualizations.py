@@ -81,9 +81,9 @@ def method1_reg(train, test):
 
     for reg in regs:
         print("Training model with reg = %s" % (reg))
-        U, V, E_in = mf.train_model(M, N, K, eta, reg, train, False)
-        E_ins.append(E_in)
-        E_outs.append(mf.get_err(U, V, test, reg, 0, 0, 0, False))
+        U, V, _ = mf.train_model(M, N, K, eta, reg, train, False)
+        E_ins.append(mf.get_err(U, V, train, 0, 0, 0, 0, False))
+        E_outs.append(mf.get_err(U, V, test, 0, 0, 0, 0, False))
 
     plt.plot(regs, E_ins, label='$E_{in}$')
     plt.plot(regs, E_outs, label='$E_{out}$')
