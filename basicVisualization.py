@@ -4,7 +4,7 @@ from collections import Counter
 import numpy as np
 
 
-def getPopularMovies(movie_ratings, movies):
+def getPopularMovies(movie_ratings, movie_ID):
     '''
     Return the top ten most popular movies (most rated) and their ratings.
     '''
@@ -77,16 +77,16 @@ def allRatingsPlot(movie_ratings, directory, title):
     plt.bar(np.arange(1, 6), hist, align='center')
     plt.title(title)
     plt.xlabel('Rating')
-    plt.ylabel('Num. Movies')
+    plt.ylabel('Num. Ratings')
     plt.savefig(directory + title + '_Histogram' + '.png', bbox_inches='tight')
     plt.clf()
 
 
-def popularRatingsPlot(movie_ratings, movies, directory, title):
+def popularRatingsPlot(movie_ratings, movie_ID, directory, title):
     '''
     Plot all ratings of ten most popular movies
     '''
-    popularMovies = getPopularMovies(movie_ratings, movies)
+    popularMovies = getPopularMovies(movie_ratings, movie_ID)
     popularMovieIds = [i[0] for i in popularMovies]
     topTenRatings = []
 
@@ -104,20 +104,16 @@ def popularRatingsPlot(movie_ratings, movies, directory, title):
          topTenRatings[3], topTenRatings[4], topTenRatings[5],
          topTenRatings[6], topTenRatings[7], topTenRatings[8],
          topTenRatings[9]], bins=[1, 2, 3, 4, 5, 6],
-         label=[
-            popularMovieIds[0], popularMovieIds[1], popularMovieIds[2],
-            popularMovieIds[3], popularMovieIds[4], popularMovieIds[5],
-            popularMovieIds[6], popularMovieIds[7], popularMovieIds[8],
-            popularMovieIds[9]])
+         label=[movie_ID[ID] for ID in popularMovieIds])
     plt.title(title)
-    plt.legend(loc='upper left')
+    plt.legend(loc='center left', bbox_to_anchor=(1.04, 0.5))
     plt.xlabel('Rating')
     plt.ylabel('Num. Ratings')
     plt.savefig(directory + title + '_Histogram' + '.png', bbox_inches='tight')
     plt.clf()
 
 
-def bestRatingsPlot(movie_ratings, directory, title):
+def bestRatingsPlot(movie_ratings, movie_ID, directory, title):
     '''
     Plot all ratings of ten best movies (highest avg. ratings)
     '''
@@ -129,13 +125,17 @@ def bestRatingsPlot(movie_ratings, directory, title):
     ratingsOfBestMovies = []
     for ratings in bestMovies.values():
         ratingsOfBestMovies += list(ratings)
-
+    
     # Plot Histogram
-    hist, _ = np.histogram(ratingsOfBestMovies, bins=[1, 2, 3, 4, 5, 6])
-    plt.bar(np.arange(1, 6), hist, align='center')
+    plt.style.use('seaborn-deep')
+    plt.hist(
+        [bestMovies[k] for k in bestMovies],
+         bins=[1, 2, 3, 4, 5, 6],
+         label=[movie_ID[k] for k in bestMovies])
     plt.title(title)
+    plt.legend(loc='center left', bbox_to_anchor=(1.04, 0.5))
     plt.xlabel('Rating')
-    plt.ylabel('Num. Movies')
+    plt.ylabel('Num. Ratings')
     plt.savefig(directory + title + '_Histogram' + '.png', bbox_inches='tight')
     plt.clf()
 
@@ -185,7 +185,7 @@ def basicVisualization(movie_ratings, movie_ID, movie_category, movie_genres,
     popularRatingsPlot(movie_ratings, movie_ID, directory, popularRatingsTitle)
 
     # Plotting all ratings of ten best movies (highest avg. ratings)
-    bestRatingsPlot(movie_ratings, directory, bestRatingsTitle)
+    bestRatingsPlot(movie_ratings, movie_ID, directory, bestRatingsTitle)
 
     # Plotting all ratings from three genres
     genreRatingsPlot(
