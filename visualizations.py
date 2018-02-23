@@ -117,6 +117,36 @@ def Homework_5_SVD(train, test):
     return U, V
 
 
+def SVD_With_Bias_With_Regularization(train, test):
+    print(BORDER)
+    print("SVD_With_Bias_With_Regularization - reg")
+    M = max(max(train[:, 0]), max(test[:, 0])).astype(int)  # users
+    N = max(max(train[:, 1]), max(test[:, 1])).astype(int)  # movies
+    print("Factorizing with ", M, " users, ", N, " movies.")
+    K = 20
+
+    regs = [10**-4, 10**-3, 10**-2, 10**-1, 1]
+    eta = 0.03  # learning rate
+    E_ins = []
+    E_outs = []
+
+    for reg in regs:
+        print("Training model with reg = %s" % (reg))
+        U, V, err, a, b, mu = bmf.train_model(M, N, K, eta, reg, train)
+        E_ins.append(bmf.get_err(U, V, train, a, b, mu, reg))
+        E_outs.append(bmf.get_err(U, V, test, a, b, mu, reg))
+
+    plt.plot(regs, E_ins, label='$E_{in}$')
+    plt.plot(regs, E_outs, label='$E_{out}$')
+    plt.title('Error vs. reg')
+    plt.xlabel('reg')
+    plt.ylabel('Error')
+    plt.xscale('log')
+    plt.legend()
+    plt.savefig('SVD_With_Bias_reg.png')
+    plt.clf()
+
+
 def SVD_With_Bias(train, test):
     print(BORDER)
     print("SVD_With_Bias")
@@ -193,29 +223,32 @@ if __name__ == '__main__':
     train = loadRatings(trainingFile)
     test  = loadRatings(testFile)
 
-    U, V = Homework_5_SVD(train, test)
+    # Run SVD with Bias, with diff. reg. values
+    SVD_With_Bias_With_Regularization(train, test)
 
-    U_proj, V_proj = projection(U, V)
+    # U, V = Homework_5_SVD(train, test)
+
+    # U_proj, V_proj = projection(U, V)
 
     #===============================================================================================
     # Visualize V for any ten movies of your choice from the MovieLens dataset.
     # Let's choose the first 10, because I'm lazy
     #===============================================================================================
-    V0 = V_proj[0, 1:10]
-    V1 = V_proj[1, 1:10]
+    # V0 = V_proj[0, 1:10]
+    # V1 = V_proj[1, 1:10]
 
     #===============================================================================================
     # Visualize V for the ten most popular movies (movies which have received the most ratings).
     #===============================================================================================
-	
+
     #===============================================================================================
 	# Visualize V for the ten best movies (movies with the highest average ratings).
     #===============================================================================================
-	
+
     #===============================================================================================
 	# Visualize V for ten movies from the Comedy genre you selected in Section 4, Basic Visualizations
     #===============================================================================================
-	
+
     #===============================================================================================
 	# Visualize V for ten movies from the Romance genre you selected in Section 4, Basic Visualizations
     #===============================================================================================
