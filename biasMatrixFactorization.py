@@ -15,7 +15,7 @@ def grad_U(Ui, Yij, Vj, ai, bj, mu, reg, eta):
     respect to Ui multiplied by eta.
     """
     t1 = Yij - mu - np.dot(Ui, Vj) - ai - bj
-    gradient = (reg * Ui) - 2*(Vj * (t1))
+    gradient = (reg * Ui) - (2 * (Vj * (t1)))
     ret = eta * gradient
     return ret
 
@@ -30,7 +30,7 @@ def grad_V(Vj, Yij, Ui, ai, bj, mu, reg, eta):
     respect to Vj multiplied by eta.
     """
     t1 = Yij - mu - np.dot(Ui, Vj) - ai - bj
-    gradient = (reg * Vj) - 2*(Ui * (t1))
+    gradient = (reg * Vj) - (2 * (Ui * (t1)))
     ret = eta * gradient
     return ret
 

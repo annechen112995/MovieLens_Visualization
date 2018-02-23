@@ -14,7 +14,7 @@ def grad_U(Ui, Yij, Vj, reg, eta):
     Returns the gradient of the regularized loss function with
     respect to Ui multiplied by eta.
     """
-    gradient = (reg * Ui) - (Vj * (Yij - np.dot(Ui, Vj)))
+    gradient = (reg * Ui) - (2 * (Vj * (Yij - np.dot(Ui, Vj))))
     ret = eta * gradient
     return ret
 
@@ -28,7 +28,7 @@ def grad_V(Vj, Yij, Ui, reg, eta):
     Returns the gradient of the regularized loss function with
     respect to Vj multiplied by eta.
     """
-    gradient = (reg * Vj) - ((Yij - np.dot(Ui, Vj)) * Ui)
+    gradient = (reg * Vj) - (2 * ((Yij - np.dot(Ui, Vj)) * Ui))
     ret = eta * gradient
     return ret
 
