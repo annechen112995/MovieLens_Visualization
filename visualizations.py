@@ -77,7 +77,7 @@ def Homework_5_SVD_With_Regularization(train, test):
     print("Factorizing with ", M, " users, ", N, " movies.")
     K = 20
 
-    regs = [10**-4, 10**-3, 10**-2, 10**-1, 1, 10, 10**2]
+    regs = [10**-4, 10**-3, 10**-2, 10**-1, 1]
     eta = 0.03  # learning rate
     E_ins = []
     E_outs = []
@@ -223,8 +223,10 @@ if __name__ == '__main__':
     train = loadRatings(trainingFile)
     test  = loadRatings(testFile)
 
-    # Run SVD with Bias, with diff. reg. values
-    SVD_With_Bias_With_Regularization(train, test)
+    # Run SVD with Bias
+    # SVD_With_Bias_With_Regularization(train, test)
+    # SVD_With_Bias(train, test)
+    Homework_5_SVD_With_Regularization(train, test)
 
     # U, V = Homework_5_SVD(train, test)
 
